@@ -1,0 +1,5 @@
+*.iml
+*.keystore
+classes/*
+out/*
+target/*
