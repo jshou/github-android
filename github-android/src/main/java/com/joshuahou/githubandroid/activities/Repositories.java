@@ -1,9 +1,7 @@
 package com.joshuahou.githubandroid.activities;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,10 @@ import android.widget.TextView;
 import com.google.gson.JsonElement;
 import com.joshuahou.githubandroid.R;
 import com.joshuahou.githubandroid.data.Repository;
-import com.joshuahou.githubandroid.util.Network;
+import com.joshuahou.githubandroid.util.NetworkRequest;
+import com.joshuahou.githubandroid.util.NetworkRequestHandler;
+import com.joshuahou.githubandroid.util.NetworkRequestMethod;
+import com.joshuahou.githubandroid.util.NetworkRequestParams;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,29 +26,15 @@ public class Repositories extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.repositories);
 
-        new RepositoriesTask(Repositories.this).execute();
+        NetworkRequestParams params = new NetworkRequestParams(NetworkRequestMethod.GET, "/user/repos");
+        new NetworkRequest(this, "Loading repositories...", new RepositoriesRequestHandler()).execute(params);
+        new RepositoriesRequestHandler();
     }
 
-    private class RepositoriesTask extends AsyncTask<String, Float, JsonElement> {
-        Context context;
-        ProgressDialog dialog;
-        
-        public RepositoriesTask(Context context) {
-            dialog = ProgressDialog.show(context, "", "Loading repositories...");
-        }
-
+    private class RepositoriesRequestHandler extends NetworkRequestHandler {
         @Override
-        protected JsonElement doInBackground(String... strings) {
-            Network network = new Network(Repositories.this);
-            return network.get("/user/repos");
-        }
-
-        @Override
-        protected void onPostExecute(JsonElement e) {
-            super.onPostExecute(e);
-            dialog.dismiss();
-
-            List<Repository> repositories = Repository.createRepositories(e);
+        public void onPostRequest(JsonElement response) {
+            List<Repository> repositories = Repository.createRepositories(response);
             Collections.sort(repositories);
 
             ListView listView = (ListView) findViewById(R.id.repository_list);

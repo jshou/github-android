@@ -1,33 +1,22 @@
 package com.joshuahou.githubandroid.activities;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.joshuahou.githubandroid.R;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthenticationException;
+import com.joshuahou.githubandroid.util.NetworkRequest;
+import com.joshuahou.githubandroid.util.NetworkRequestHandler;
+import com.joshuahou.githubandroid.util.NetworkRequestMethod;
+import com.joshuahou.githubandroid.util.NetworkRequestParams;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.IOException;
 
 public class Signin extends Activity {
-
-    private static String TAG = "githubandroid";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,51 +33,16 @@ public class Signin extends Activity {
         } else if (password.getText().length() == 0) {
             Toast.makeText(Signin.this, "Please enter your password!", Toast.LENGTH_SHORT).show();
         } else {
-            ProgressDialog dialog = ProgressDialog.show(this, "", "Loading...");
-            new SigninTask(dialog).execute(new UsernamePasswordCredentials(username.getText().toString(), password.getText().toString()));
+            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username.getText().toString(), password.getText().toString());
+            NetworkRequestParams params = new NetworkRequestParams(NetworkRequestMethod.AUTHENTICATE, credentials);
+            new NetworkRequest(this, "Signing in...", new SigninRequestHandler()).execute(params);
         }
     }
 
-    private class SigninTask extends AsyncTask<UsernamePasswordCredentials, Float, String> {
-        private ProgressDialog dialog;
-
-        public SigninTask(ProgressDialog dialog) {
-            this.dialog = dialog;
-        }
-
+    private class SigninRequestHandler extends NetworkRequestHandler {
         @Override
-        protected String doInBackground(final UsernamePasswordCredentials... credentialsArray) {
-            try {
-                DefaultHttpClient client = new DefaultHttpClient();
-
-                HttpHost host = new HttpHost("api.github.com", 443, "https");
-                HttpPost post = new HttpPost("/authorizations");
-                StringEntity entity = new StringEntity("{\"scopes\": [\"repo\"], \"note\": \"android app\"}");
-                post.setEntity(entity);
-                post.addHeader("Content-Type", "application/json");
-                post.addHeader(new BasicScheme().authenticate(credentialsArray[0], post));
-
-                String response = client.execute(host, post, new BasicResponseHandler());
-
-                Log.i("SIGNIN", response);
-                JsonParser parser = new JsonParser();
-                JsonElement element = parser.parse(response);
-                JsonElement token = element.getAsJsonObject().get("token");
-                return token.getAsString();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            } catch (AuthenticationException e) {
-                e.printStackTrace();
-                return null;
-            } finally {
-                dialog.dismiss();
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String token) {
-            super.onPostExecute(token);
+        public void onPostRequest(JsonElement response) {
+            String token = response.getAsJsonObject().get("token").getAsString();
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(Signin.this);
             SharedPreferences.Editor editor = preferences.edit();
@@ -99,6 +53,5 @@ public class Signin extends Activity {
             startActivity(intent);
         }
     }
-
 }
 
