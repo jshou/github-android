@@ -2,4 +2,4 @@
 *.keystore
 classes/*
 out/*
-target/*
+github-android/target/*
