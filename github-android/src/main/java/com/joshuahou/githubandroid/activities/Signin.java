@@ -1,7 +1,8 @@
-package com.joshuahou.githubandroid;
+package com.joshuahou.githubandroid.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.joshuahou.githubandroid.R;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -23,14 +25,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
 
-public class Main extends Activity {
+public class Signin extends Activity {
 
     private static String TAG = "githubandroid";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.signin);
     }
 
     public void signIn(View button) {
@@ -38,9 +40,9 @@ public class Main extends Activity {
         EditText password = (EditText) findViewById(R.id.password);
 
         if (username.getText().length() == 0) {
-            Toast.makeText(Main.this, "Please enter your Github username!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Signin.this, "Please enter your Github username!", Toast.LENGTH_SHORT).show();
         } else if (password.getText().length() == 0) {
-            Toast.makeText(Main.this, "Please enter your password!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Signin.this, "Please enter your password!", Toast.LENGTH_SHORT).show();
         } else {
             ProgressDialog dialog = ProgressDialog.show(this, "", "Loading...");
             new SigninTask(dialog).execute(new UsernamePasswordCredentials(username.getText().toString(), password.getText().toString()));
@@ -61,7 +63,7 @@ public class Main extends Activity {
 
                 HttpHost host = new HttpHost("api.github.com", 443, "https");
                 HttpPost post = new HttpPost("/authorizations");
-                StringEntity entity = new StringEntity("{\"scopes\": [\"public_repo\"], \"note\": \"admin script\"}");
+                StringEntity entity = new StringEntity("{\"scopes\": [\"repo\"], \"note\": \"android app\"}");
                 post.setEntity(entity);
                 post.addHeader("Content-Type", "application/json");
                 post.addHeader(new BasicScheme().authenticate(credentialsArray[0], post));
@@ -88,10 +90,13 @@ public class Main extends Activity {
         protected void onPostExecute(String token) {
             super.onPostExecute(token);
 
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(Main.this);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(Signin.this);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("token", token);
             editor.commit();
+
+            Intent intent = new Intent(Signin.this, Main.class);
+            startActivity(intent);
         }
     }
 
