@@ -2,12 +2,14 @@ package com.joshuahou.githubandroid.network;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.joshuahou.githubandroid.activities.Signin;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -22,7 +24,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-public class NetworkRequest extends AsyncTask<NetworkRequestParams, Float, JsonElement> {
+public class NetworkRequest extends AsyncTask<NetworkRequestParams, Float, Boolean> {
     private DefaultHttpClient client;
     private HttpHost host;
     private String token;
@@ -30,6 +32,7 @@ public class NetworkRequest extends AsyncTask<NetworkRequestParams, Float, JsonE
     private Context context;
     private ProgressDialog dialog;
     private String loadingMessage;
+    private JsonElement response;
 
     public NetworkRequest(Context context, String loadingMessage, NetworkRequestHandler handler) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -55,29 +58,42 @@ public class NetworkRequest extends AsyncTask<NetworkRequestParams, Float, JsonE
     }
 
     @Override
-    protected JsonElement doInBackground(NetworkRequestParams... paramsArray) {
+    protected Boolean doInBackground(NetworkRequestParams... paramsArray) {
         NetworkRequestParams params = paramsArray[0];
-        switch (params.getMethod()) {
-            case GET:
-                return get(params.getPath());
-            case POST:
-                return post(params.getPath(), params.getSubmission());
-            case AUTHENTICATE:
-                return authenticate(params.getCredentials());
-            default:
-                return null;
+
+        try {
+            switch (params.getMethod()) {
+                case GET:
+                    response = get(params.getPath());
+                    break;
+                case POST:
+                    response = post(params.getPath(), params.getSubmission());
+                    break;
+                case AUTHENTICATE:
+                    response = authenticate(params.getCredentials());
+                    break;
+            }
+
+            return true;
+        } catch (ClientProtocolException e) {
+            return false;
         }
     }
 
     @Override
-    protected void onPostExecute(JsonElement response) {
-        super.onPostExecute(response);
+    protected void onPostExecute(Boolean success) {
+        super.onPostExecute(success);
         dialog.dismiss();
 
-        if (response == null) {
-            Toast.makeText(context, "Network error. Please try again.", Toast.LENGTH_SHORT).show();
+        if (success) {
+            if (response == null) {
+                Toast.makeText(context, "Network error. Please try again.", Toast.LENGTH_SHORT).show();
+            } else {
+                handler.onPostRequest(response);
+            }
         } else {
-            handler.onPostRequest(response);
+            Toast.makeText(context, "Please sign in.", Toast.LENGTH_SHORT).show();
+            context.startActivity(new Intent(context, Signin.class));
         }
     }
 
@@ -105,7 +121,7 @@ public class NetworkRequest extends AsyncTask<NetworkRequestParams, Float, JsonE
         return null;
     }
 
-    private JsonElement get(String path) {
+    private JsonElement get(String path) throws ClientProtocolException {
         try {
             HttpGet get = new HttpGet(path);
             get.addHeader("Content-Type", "application/json");
@@ -119,7 +135,7 @@ public class NetworkRequest extends AsyncTask<NetworkRequestParams, Float, JsonE
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (ClientProtocolException e) {
-            e.printStackTrace();
+            throw new ClientProtocolException("Authentication failed");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -127,7 +143,7 @@ public class NetworkRequest extends AsyncTask<NetworkRequestParams, Float, JsonE
         return null;
     }
 
-    private JsonElement post(String path, String json) {
+    private JsonElement post(String path, String json) throws ClientProtocolException {
         try {
             HttpPost post = new HttpPost(path);
             post.setEntity(new StringEntity(json));
@@ -143,7 +159,7 @@ public class NetworkRequest extends AsyncTask<NetworkRequestParams, Float, JsonE
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (ClientProtocolException e) {
-            e.printStackTrace();
+            throw new ClientProtocolException("Authentication failed");
         } catch (IOException e) {
             e.printStackTrace();
         }

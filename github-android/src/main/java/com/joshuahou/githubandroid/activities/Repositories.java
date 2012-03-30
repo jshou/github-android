@@ -38,7 +38,9 @@ public class Repositories extends Activity {
     protected void onPause() {
         super.onPause();
 
-        repositoriesRequest.kill();
+        if (repositoriesRequest != null) {
+            repositoriesRequest.kill();
+        }
     }
 
     private class RepositoriesRequestHandler extends NetworkRequestHandler {

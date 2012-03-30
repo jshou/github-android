@@ -29,7 +29,9 @@ public class Signin extends Activity {
     protected void onPause() {
         super.onPause();
 
-        authenticateRequest.kill();
+        if (authenticateRequest != null) {
+            authenticateRequest.kill();
+        }
     }
 
     public void signIn(View button) {
