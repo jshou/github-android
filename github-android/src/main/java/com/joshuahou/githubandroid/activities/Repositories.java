@@ -12,10 +12,10 @@ import android.widget.TextView;
 import com.google.gson.JsonElement;
 import com.joshuahou.githubandroid.R;
 import com.joshuahou.githubandroid.data.Repository;
-import com.joshuahou.githubandroid.util.NetworkRequest;
-import com.joshuahou.githubandroid.util.NetworkRequestHandler;
-import com.joshuahou.githubandroid.util.NetworkRequestMethod;
-import com.joshuahou.githubandroid.util.NetworkRequestParams;
+import com.joshuahou.githubandroid.network.NetworkRequest;
+import com.joshuahou.githubandroid.network.NetworkRequestHandler;
+import com.joshuahou.githubandroid.network.NetworkRequestMethod;
+import com.joshuahou.githubandroid.network.NetworkRequestParams;
 
 import java.util.Collections;
 import java.util.List;

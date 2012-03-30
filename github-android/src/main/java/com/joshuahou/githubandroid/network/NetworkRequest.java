@@ -1,4 +1,4 @@
-package com.joshuahou.githubandroid.util;
+package com.joshuahou.githubandroid.network;
 
 import android.app.ProgressDialog;
 import android.content.Context;

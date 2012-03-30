@@ -1,4 +1,4 @@
-package com.joshuahou.githubandroid.util;
+package com.joshuahou.githubandroid.network;
 
 import org.apache.http.auth.UsernamePasswordCredentials;
 
