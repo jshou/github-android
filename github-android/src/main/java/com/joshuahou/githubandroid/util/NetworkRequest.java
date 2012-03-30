@@ -41,6 +41,12 @@ public class NetworkRequest extends AsyncTask<NetworkRequestParams, Float, JsonE
         this.loadingMessage = loadingMessage;
     }
 
+    public void kill() {
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+    }
+
     @Override
     protected void onPreExecute() {
         super.onPreExecute();

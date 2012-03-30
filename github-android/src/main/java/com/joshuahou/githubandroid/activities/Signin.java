@@ -17,11 +17,19 @@ import com.joshuahou.githubandroid.util.NetworkRequestParams;
 import org.apache.http.auth.UsernamePasswordCredentials;
 
 public class Signin extends Activity {
+    private NetworkRequest authenticateRequest;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signin);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        authenticateRequest.kill();
     }
 
     public void signIn(View button) {
@@ -35,7 +43,8 @@ public class Signin extends Activity {
         } else {
             UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username.getText().toString(), password.getText().toString());
             NetworkRequestParams params = new NetworkRequestParams(NetworkRequestMethod.AUTHENTICATE, credentials);
-            new NetworkRequest(this, "Signing in...", new SigninRequestHandler()).execute(params);
+            authenticateRequest = new NetworkRequest(this, "Signing in...", new SigninRequestHandler());
+            authenticateRequest.execute(params);
         }
     }
 

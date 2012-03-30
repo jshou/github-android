@@ -22,13 +22,23 @@ import java.util.List;
 
 
 public class Repositories extends Activity {
+    private NetworkRequest repositoriesRequest;
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.repositories);
 
         NetworkRequestParams params = new NetworkRequestParams(NetworkRequestMethod.GET, "/user/repos");
-        new NetworkRequest(this, "Loading repositories...", new RepositoriesRequestHandler()).execute(params);
-        new RepositoriesRequestHandler();
+        repositoriesRequest = new NetworkRequest(this, "Loading repositories...", new RepositoriesRequestHandler());
+        repositoriesRequest.execute(params);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        repositoriesRequest.kill();
     }
 
     private class RepositoriesRequestHandler extends NetworkRequestHandler {
