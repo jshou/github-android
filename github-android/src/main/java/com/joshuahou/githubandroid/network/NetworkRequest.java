@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.apache.http.HttpHost;
@@ -72,7 +73,12 @@ public class NetworkRequest extends AsyncTask<NetworkRequestParams, Float, JsonE
     protected void onPostExecute(JsonElement response) {
         super.onPostExecute(response);
         dialog.dismiss();
-        handler.onPostRequest(response);
+
+        if (response == null) {
+            Toast.makeText(context, "Network error. Please try again.", Toast.LENGTH_SHORT).show();
+        } else {
+            handler.onPostRequest(response);
+        }
     }
 
     private JsonElement authenticate(UsernamePasswordCredentials credentials) {

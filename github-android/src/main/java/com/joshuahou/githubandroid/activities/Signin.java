@@ -58,8 +58,7 @@ public class Signin extends Activity {
             editor.putString("token", token);
             editor.commit();
 
-            Intent intent = new Intent(Signin.this, Main.class);
-            startActivity(intent);
+            startActivity(new Intent(Signin.this, Main.class));
         }
     }
 }
