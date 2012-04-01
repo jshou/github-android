@@ -15,7 +15,7 @@ public class Main extends Activity {
         setContentView(R.layout.main);
 
         if (!PreferenceManager.getDefaultSharedPreferences(this).contains("token")) {
-            startActivity(new Intent(this, Signin.class));
+            startActivity(logoutIntent());
         }
     }
 
@@ -28,6 +28,12 @@ public class Main extends Activity {
         editor.remove("token");
         editor.commit();
 
-        startActivity(new Intent(this, Signin.class));
+        startActivity(logoutIntent());
+    }
+    
+    private Intent logoutIntent() {
+        Intent intent = new Intent(this, Signin.class);
+        finish();
+        return intent;
     }
 }

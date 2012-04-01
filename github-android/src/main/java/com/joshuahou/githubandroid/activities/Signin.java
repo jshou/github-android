@@ -61,6 +61,7 @@ public class Signin extends Activity {
             editor.commit();
 
             startActivity(new Intent(Signin.this, Main.class));
+            finish();
         }
     }
 }
