@@ -9,6 +9,11 @@
               android:layout_height="wrap_content"
               android:text="Repositories"
               android:onClick="lookAtRepos"/>
+    <Button android:id="@+id/pull_requests"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Pull Requests"
+            android:onClick="lookAtPullRequests"/>
     <Button android:id="@+id/logout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

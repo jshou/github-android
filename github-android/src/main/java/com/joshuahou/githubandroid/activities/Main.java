@@ -23,6 +23,10 @@ public class Main extends Activity {
         startActivity(new Intent(this, Repositories.class));
     }
     
+    public void lookAtPullRequests(View v) {
+        startActivity(new Intent(this, PullRequests.class));
+    }
+    
     public void logout(View v) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
         editor.remove("token");
