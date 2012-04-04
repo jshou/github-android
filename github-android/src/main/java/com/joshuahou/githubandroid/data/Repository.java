@@ -9,12 +9,12 @@ import java.util.List;
 
 public class Repository implements Comparable<Repository> {
     private String name;
-    private boolean private_repo;
+    private boolean privateRepo;
     private String owner;
 
     public Repository(JsonObject json) {
         this.name = json.get("name").getAsString();
-        this.private_repo = json.get("private").getAsBoolean();
+        this.privateRepo = json.get("private").getAsBoolean();
         this.owner = json.get("owner").getAsJsonObject().get("login").getAsString();
     }
     
@@ -33,8 +33,8 @@ public class Repository implements Comparable<Repository> {
         return name;
     }
 
-    public boolean isPrivate_repo() {
-        return private_repo;
+    public boolean isPrivate() {
+        return privateRepo;
     }
 
     public String getOwner() {

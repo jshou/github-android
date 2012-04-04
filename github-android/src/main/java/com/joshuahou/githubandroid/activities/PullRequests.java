@@ -1,12 +1,10 @@
 package com.joshuahou.githubandroid.activities;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
 import com.google.gson.JsonElement;
 import com.joshuahou.githubandroid.network.NetworkRequest;
 import com.joshuahou.githubandroid.network.NetworkRequestHandler;
